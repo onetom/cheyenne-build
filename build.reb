@@ -64,11 +64,20 @@ www-dir: %www
 download-path: %dl
 publish-dir: www-dir/:download-path
 
+build: does [
+	make-dir/deep www-dir
+	make-dir/deep publish-dir
+	update-source
+	build-cache.efs
+	build-encap-paths.r
+	publish-builds reduce [build-exe pro   build-exe cmd]
+	publish-dists reduce [build-dist %.tar.gz   build-dist %.zip]
+]
+
 update-source: does [
 	unless dir? repo/.git [ exec git {clone https://github.com/dockimbel/cheyenne/} ]
 	exec git {pull}
 ]
-	; update-source dependencies
 	exec: funct [params /read] [
 		params: reform params
 		either read
@@ -89,11 +98,9 @@ publish-builds: funct [builds] [
 		build-inc download-path
 			queue build-dir/latest-builds.reb builds 5 * 2	; 5 pairs of pro and cmd builds
 ]
-	; publish-builds dependencies
 	build-inc: funct [download-path files] [
 		ajoin map-each file files [ li-a download-path/:file file ]
 	]
-		; builds.html dependencies
 		li-a: funct [href txt] [
 			ajoin [<li> build-tag[a href (href)] txt </a> </li> newline]
 		]
@@ -106,7 +113,6 @@ publish-builds: funct [builds] [
 		foreach build obsolete-files [ delete build ]
 		new-files
 	]
-		; queue dependencies
 		push: funct [q items /limit size] [
 			skip   tail union q items   negate size
 		]
@@ -117,11 +123,8 @@ build-exe: funct ['encapper] [
 	exec gzip publish-dir/:exe
 	join exe %.gz
 ]
-	; build-exe dependencies
 	exe-name: funct ['encapper] [ rejoin [%cheyenne-linux- ver %- :encapper] ]
-		; exe-name dependencies
 		ver: does [ ver: trim/lines exec/read git {rev-parse --short HEAD} ]
-
 	encap: funct [exe 'encapper] [
 		reduce [
 			to-local-file sdk/tools/(join {en} :encapper)
@@ -142,13 +145,6 @@ build-dist: funct [ext] [
 	exec git [{archive -o} publish-dir/:dist-file {HEAD}]
 	dist-file
 ]
-	; build-dist dependencies
 	dist-name: funct [] [ rejoin [%cheyenne- ver] ]
 
-make-dir/deep www-dir
-make-dir/deep publish-dir
-update-source
-build-cache.efs
-build-encap-paths.r
-publish-builds reduce [build-exe pro   build-exe cmd]
-publish-dists reduce [build-dist %.tar.gz   build-dist %.zip]
+build
