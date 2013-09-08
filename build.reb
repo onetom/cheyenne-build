@@ -123,8 +123,20 @@ build-exe: funct ['encapper] [
 	exec gzip publish-dir/:exe
 	join exe %.gz
 ]
+	make-timestamp: does [
+		rejoin [
+			either now/day < 10 [join "0" now/day][now/day]
+			copy/part pick system/locale/months now/month 3
+			now/year - 2000
+		]
+	]
 	exe-name: funct ['encapper] [ rejoin [%cheyenne-linux- ver %- :encapper] ]
-		ver: does [ ver: trim/lines exec/read git {rev-parse --short HEAD} ]
+		ver: does [ 
+			ver: rejoin [
+				make-timestamp #"-"
+				trim/lines exec/read git {rev-parse --short HEAD}
+			]
+		]
 	encap: funct [exe 'encapper] [
 		reduce [
 			to-local-file sdk/tools/(join {en} :encapper)
