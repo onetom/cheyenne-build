@@ -60,7 +60,7 @@ Rebol [
 build-dir: clean-path system/options/path
 sdk: build-dir/sdk
 repo: build-dir/cheyenne
-www-dir: %www
+www-dir: %/home/dk/cheyenne-server.org/
 download-path: %dl
 publish-dir: www-dir/:download-path
 
@@ -70,7 +70,7 @@ build: does [
 	update-source
 	build-cache.efs
 	build-encap-paths.r
-	publish-builds reduce [build-exe pro   build-exe cmd]
+	publish-builds reduce [build-exe pro]
 	publish-dists reduce [build-dist %.tar.gz   build-dist %.zip]
 ]
 
@@ -120,11 +120,22 @@ publish-builds: funct [builds] [
 build-exe: funct ['encapper] [
 	exe: exe-name :encapper
 	exec encap publish-dir/:exe :encapper
-	exec gzip publish-dir/:exe
-	join exe %.gz
+	exe
 ]
+	make-timestamp: does [
+		rejoin [
+			either now/day < 10 [join "0" now/day][now/day]
+			lowercase copy/part pick system/locale/months now/month 3
+			now/year - 2000
+		]
+	]
 	exe-name: funct ['encapper] [ rejoin [%cheyenne-linux- ver %- :encapper] ]
-		ver: does [ ver: trim/lines exec/read git {rev-parse --short HEAD} ]
+		ver: does [ 
+			ver: rejoin [
+				make-timestamp #"-"
+				trim/lines exec/read git {rev-parse --short HEAD}
+			]
+		]
 	encap: funct [exe 'encapper] [
 		reduce [
 			to-local-file sdk/tools/(join {en} :encapper)
@@ -132,7 +143,6 @@ build-exe: funct ['encapper] [
 			repo/Cheyenne/cheyenne.r
 		]
 	]
-	gzip: funct [file] [ reduce [{gzip -f} file {>} join file %.gz] ]
 
 publish-dists:  funct [dists] [
 	write www-dir/dists.inc
