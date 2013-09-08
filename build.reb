@@ -60,7 +60,7 @@ Rebol [
 build-dir: clean-path system/options/path
 sdk: build-dir/sdk
 repo: build-dir/cheyenne
-www-dir: %www
+www-dir: %/home/dk/cheyenne-server.org/
 download-path: %dl
 publish-dir: www-dir/:download-path
 
