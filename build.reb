@@ -125,7 +125,7 @@ build-exe: funct ['encapper] [
 	make-timestamp: does [
 		rejoin [
 			either now/day < 10 [join "0" now/day][now/day]
-			copy/part pick system/locale/months now/month 3
+			lowercase copy/part pick system/locale/months now/month 3
 			now/year - 2000
 		]
 	]
