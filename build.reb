@@ -120,8 +120,7 @@ publish-builds: funct [builds] [
 build-exe: funct ['encapper] [
 	exe: exe-name :encapper
 	exec encap publish-dir/:exe :encapper
-	exec gzip publish-dir/:exe
-	join exe %.gz
+	exe
 ]
 	make-timestamp: does [
 		rejoin [
@@ -144,7 +143,6 @@ build-exe: funct ['encapper] [
 			repo/Cheyenne/cheyenne.r
 		]
 	]
-	gzip: funct [file] [ reduce [{gzip -f} file {>} join file %.gz] ]
 
 publish-dists:  funct [dists] [
 	write www-dir/dists.inc
