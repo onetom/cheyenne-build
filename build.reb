@@ -70,7 +70,7 @@ build: does [
 	update-source
 	build-cache.efs
 	build-encap-paths.r
-	publish-builds reduce [build-exe pro   build-exe cmd]
+	publish-builds reduce [build-exe pro]
 	publish-dists reduce [build-dist %.tar.gz   build-dist %.zip]
 ]
 
